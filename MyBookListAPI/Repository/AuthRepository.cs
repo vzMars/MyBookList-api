@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using MyBookListAPI.Data;
 using MyBookListAPI.Dto;
 using MyBookListAPI.Interfaces;
 using MyBookListAPI.Models;
@@ -11,13 +10,12 @@ namespace MyBookListAPI.Repository
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ApplicationDbContext _context;
 
-        public AuthRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDbContext context)
+
+        public AuthRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _context = context;
         }
 
         public async Task<AuthResponse> Login(LoginRequest request)
