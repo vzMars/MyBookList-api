@@ -3,12 +3,12 @@
     public class Book
     {
         public int Id { get; set; }
-        public string BookId { get; set; }
+        public string GoogleBooksId { get; set; }
         public string Title { get; set; }
-        public List<string> Authors { get; set; }
         public string Cover { get; set; }
-        public Status Status { get; set; }
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        public ICollection<Author> Authors { get; set; }
+        public ICollection<BookAuthor> BookAuthors { get; set; }
+        public ICollection<ApplicationUser> Users { get; set; }
+        public ICollection<BookUser> BookUsers { get; set; }
     }
 }
