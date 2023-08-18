@@ -48,9 +48,16 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpPost("Signup")]
-        public ActionResult<string> Signup()
+        public async Task<ActionResult<AuthResponse>> Signup(SignupRequest request)
         {
-            return Ok("signup");
+            var response = await _authRepository.Signup(request);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
     }
 }
