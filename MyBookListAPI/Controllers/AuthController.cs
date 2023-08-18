@@ -36,9 +36,16 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpPost("Login")]
-        public ActionResult<string> Login()
+        public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
         {
-            return Ok("login");
+            var response = await _authRepository.Login(request);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("Logout")]

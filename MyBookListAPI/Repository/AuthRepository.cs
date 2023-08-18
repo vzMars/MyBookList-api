@@ -20,9 +20,39 @@ namespace MyBookListAPI.Repository
             _context = context;
         }
 
-        public Task<AuthResponse> Login(LoginRequest request)
+        public async Task<AuthResponse> Login(LoginRequest request)
         {
-            throw new NotImplementedException();
+            var response = new AuthResponse
+            {
+                Message = "Incorrect email or password."
+            };
+
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+            {
+                response.Message = "Please complete all required fields.";
+                return response;
+            }
+
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null) return response;
+
+            var result = await _signInManager.PasswordSignInAsync(user, request.Password, true, false);
+
+            if (result.Succeeded)
+            {
+                response.Success = true;
+                response.User = new User
+                {
+                    Id = user.Id,
+                    Email = user.Email!,
+                    Username = user.UserName!
+                };
+
+                response.Message = "Successfully logged in.";
+                return response;
+            }
+
+            return response;
         }
 
         public Task<AuthResponse> Logout()
