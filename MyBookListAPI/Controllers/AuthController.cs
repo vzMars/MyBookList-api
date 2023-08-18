@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MyBookListAPI.Dto;
+using MyBookListAPI.Interfaces;
+using System.Security.Claims;
 
 namespace MyBookListAPI.Controllers
 {
@@ -6,10 +10,29 @@ namespace MyBookListAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<string> AuthStatus()
+        private readonly IAuthRepository _authRepository;
+
+        public AuthController(IAuthRepository authRepository)
         {
-            return Ok("auth status");
+            _authRepository = authRepository;
+        }
+
+        [HttpGet]
+        [Authorize]
+        public ActionResult<AuthResponse> AuthStatus()
+        {
+            var response = new AuthResponse
+            {
+                Success = true,
+                User = new User
+                {
+                    Id = User.FindFirstValue(ClaimTypes.NameIdentifier)!,
+                    Email = User.FindFirstValue(ClaimTypes.Email)!,
+                    Username = User.FindFirstValue(ClaimTypes.Name)!,
+                }
+            };
+
+            return Ok(response);
         }
 
         [HttpPost("Login")]
