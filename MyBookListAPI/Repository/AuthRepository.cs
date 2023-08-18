@@ -55,9 +55,15 @@ namespace MyBookListAPI.Repository
             return response;
         }
 
-        public Task<AuthResponse> Logout()
+        public async Task<AuthResponse> Logout()
         {
-            throw new NotImplementedException();
+            var response = new AuthResponse();
+
+            await _signInManager.SignOutAsync();
+            response.Success = true;
+            response.Message = "Successfully logged out.";
+
+            return response;
         }
 
         public async Task<AuthResponse> Signup(SignupRequest request)
