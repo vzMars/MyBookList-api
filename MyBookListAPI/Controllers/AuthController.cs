@@ -24,7 +24,7 @@ namespace MyBookListAPI.Controllers
             var response = new AuthResponse
             {
                 Success = true,
-                User = new User
+                User = new AuthUser
                 {
                     Id = User.FindFirstValue(ClaimTypes.NameIdentifier)!,
                     Email = User.FindFirstValue(ClaimTypes.Email)!,

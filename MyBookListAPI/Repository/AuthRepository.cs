@@ -11,7 +11,6 @@ namespace MyBookListAPI.Repository
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-
         public AuthRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
@@ -39,7 +38,7 @@ namespace MyBookListAPI.Repository
             if (result.Succeeded)
             {
                 response.Success = true;
-                response.User = new User
+                response.User = new AuthUser
                 {
                     Id = user.Id,
                     Email = user.Email!,
@@ -117,7 +116,7 @@ namespace MyBookListAPI.Repository
 
             if (result.Succeeded)
             {
-                response.User = new User
+                response.User = new AuthUser
                 {
                     Id = user.Id,
                     Email = user.Email,
