@@ -22,5 +22,11 @@ namespace MyBookListAPI.Controllers
         {
             return await _userRepository.GetUsers();
         }
+
+        [HttpGet("{username}")]
+        public async Task<ActionResult<string>> GetProfile(string username)
+        {
+            return Ok("get profile route");
+        }
     }
 }
