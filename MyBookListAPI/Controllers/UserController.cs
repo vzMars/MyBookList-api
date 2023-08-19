@@ -18,9 +18,10 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetUsers()
+        public async Task<ActionResult<ICollection<User>>> GetUsers()
         {
-            return await _userRepository.GetUsers();
+            var users = await _userRepository.GetUsers();
+            return Ok(users);
         }
 
         [HttpGet("{username}")]

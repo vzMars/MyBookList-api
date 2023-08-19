@@ -17,7 +17,7 @@ namespace MyBookListAPI.Repository
             _mapper = mapper;
         }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<ICollection<User>> GetUsers()
         {
             var users = await _context.Users.ToListAsync();
 

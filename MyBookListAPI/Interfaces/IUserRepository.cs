@@ -4,6 +4,6 @@ namespace MyBookListAPI.Interfaces
 {
     public interface IUserRepository
     {
-        Task<List<User>> GetUsers();
+        Task<ICollection<User>> GetUsers();
     }
 }
