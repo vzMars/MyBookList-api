@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyBookListAPI.Dto;
+using MyBookListAPI.Interfaces;
 
 namespace MyBookListAPI.Controllers
 {
@@ -8,6 +10,13 @@ namespace MyBookListAPI.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
+        private readonly IBookRepository _bookRepository;
+
+        public BookController(IBookRepository bookRepository)
+        {
+            _bookRepository = bookRepository;
+        }
+
         [HttpGet]
         public async Task<ActionResult<string>> GetBooks()
         {
@@ -21,9 +30,10 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpGet("search/{query}")]
-        public async Task<ActionResult<string>> SearchBooks(string query)
+        public async Task<ActionResult<ICollection<Volume>>> SearchBooks(string query)
         {
-            return Ok("search books route");
+            var books = await _bookRepository.SearchBooks(query);
+            return Ok(books);
         }
 
         [HttpPost]
