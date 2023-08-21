@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MyBookListAPI.Dto;
 using MyBookListAPI.Interfaces;
+using System.Security.Claims;
 
 namespace MyBookListAPI.Controllers
 {
@@ -17,6 +18,8 @@ namespace MyBookListAPI.Controllers
             _bookRepository = bookRepository;
         }
 
+        private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
         [HttpGet]
         public async Task<ActionResult<string>> GetBooks()
         {
@@ -24,9 +27,16 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<string>> GetBook(int id)
+        public async Task<ActionResult<GetBookResponse>> GetBook(string id)
         {
-            return Ok("get book route");
+            var response = await _bookRepository.GetBook(id, GetUserId());
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("search/{query}")]
