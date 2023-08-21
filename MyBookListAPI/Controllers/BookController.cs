@@ -47,9 +47,16 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<string>> AddBook()
+        public async Task<ActionResult<AddBookResponse>> AddBook(AddBookRequest request)
         {
-            return Ok("add book route");
+            var response = await _bookRepository.AddBook(request, GetUserId());
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
 
         [HttpPut("{id}")]
