@@ -21,9 +21,10 @@ namespace MyBookListAPI.Controllers
         private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         [HttpGet]
-        public async Task<ActionResult<string>> GetBooks()
+        public async Task<ActionResult<ICollection<BookResponse>>> GetBooks()
         {
-            return Ok("get books route");
+            var books = await _bookRepository.GetBooks();
+            return Ok(books);
         }
 
         [HttpGet("{id}")]

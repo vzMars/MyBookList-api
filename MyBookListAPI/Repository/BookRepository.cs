@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using MyBookListAPI.Data;
 using MyBookListAPI.Dto;
 using MyBookListAPI.Interfaces;
@@ -12,12 +13,14 @@ namespace MyBookListAPI.Repository
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _config;
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public BookRepository(HttpClient httpClient, IConfiguration config, ApplicationDbContext context)
+        public BookRepository(HttpClient httpClient, IConfiguration config, ApplicationDbContext context, IMapper mapper)
         {
             _httpClient = httpClient;
             _config = config;
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<AddBookResponse> AddBook(AddBookRequest request, string userId)
@@ -73,16 +76,12 @@ namespace MyBookListAPI.Repository
             addBookResponse.Book = new BookResponse
             {
                 Id = book.Id,
-                Authors = book.Authors.Select(a => a.Name).ToList(),
+                Authors = request.Authors,
                 GoogleBooksId = book.GoogleBooksId,
                 Cover = book.Cover,
                 Status = bookUser.Status,
                 Title = book.Title,
-                User = new User
-                {
-                    Username = user.UserName!,
-                    Id = user.Id
-                }
+                User = _mapper.Map<User>(user)
             };
             addBookResponse.Success = true;
             return addBookResponse;
@@ -118,6 +117,24 @@ namespace MyBookListAPI.Repository
                 getBookResponse.Message = "The book ID could not be found.";
                 return getBookResponse;
             }
+        }
+
+        public async Task<ICollection<BookResponse>> GetBooks()
+        {
+            var books = await _context.BookUsers
+                .Select(bu => new BookResponse
+                {
+                    Id = bu.BookId,
+                    Authors = bu.Book.Authors.Select(a => a.Name).ToList(),
+                    GoogleBooksId = bu.Book.GoogleBooksId,
+                    Cover = bu.Book.Cover,
+                    Status = bu.Status,
+                    Title = bu.Book.Title,
+                    User = _mapper.Map<User>(bu.User)
+                })
+                .ToListAsync();
+
+            return books;
         }
 
         public async Task<ICollection<Volume>> SearchBooks(string query)
