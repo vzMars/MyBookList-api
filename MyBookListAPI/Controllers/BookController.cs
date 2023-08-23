@@ -21,7 +21,7 @@ namespace MyBookListAPI.Controllers
         private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<BookResponse>>> GetBooks()
+        public async Task<ActionResult<ICollection<BookUserItem>>> GetBooks()
         {
             var books = await _bookRepository.GetBooks();
             return Ok(books);
@@ -48,7 +48,7 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<AddBookResponse>> AddBook(AddBookRequest request)
+        public async Task<ActionResult<BookUserResponse>> AddBook(AddBookRequest request)
         {
             var response = await _bookRepository.AddBook(request, GetUserId());
 
@@ -61,9 +61,16 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<string>> UpdateBookStatus(int id)
+        public async Task<ActionResult<BookUserResponse>> UpdateBookStatus(string id, UpdateStatusRequest request)
         {
-            return Ok("update book status route");
+            var response = await _bookRepository.UpdateBookStatus(id, GetUserId(), request);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]

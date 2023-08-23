@@ -23,16 +23,16 @@ namespace MyBookListAPI.Repository
             _mapper = mapper;
         }
 
-        public async Task<AddBookResponse> AddBook(AddBookRequest request, string userId)
+        public async Task<BookUserResponse> AddBook(AddBookRequest request, string userId)
         {
-            var addBookResponse = new AddBookResponse();
+            var response = new BookUserResponse();
             var book = new Book();
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
-                addBookResponse.Message = "User does not exist.";
-                return addBookResponse;
+                response.Message = "User does not exist.";
+                return response;
             }
 
             var bookExists = await _context.Books.FirstOrDefaultAsync(b => b.GoogleBooksId == request.GoogleBooksId);
@@ -58,8 +58,8 @@ namespace MyBookListAPI.Repository
             var addedBookToList = await _context.BookUsers.FirstOrDefaultAsync(bu => bu.UserId == userId && bu.Book.GoogleBooksId == request.GoogleBooksId);
             if (addedBookToList != null)
             {
-                addBookResponse.Message = "Already added book to your list.";
-                return addBookResponse;
+                response.Message = "Already added book to your list.";
+                return response;
             }
 
             var bookUser = new BookUser
@@ -73,7 +73,7 @@ namespace MyBookListAPI.Repository
             await _context.SaveChangesAsync();
 
 
-            addBookResponse.Book = new BookResponse
+            response.Book = new BookUserItem
             {
                 Id = book.Id,
                 Authors = request.Authors,
@@ -83,8 +83,8 @@ namespace MyBookListAPI.Repository
                 Title = book.Title,
                 User = _mapper.Map<User>(user)
             };
-            addBookResponse.Success = true;
-            return addBookResponse;
+            response.Success = true;
+            return response;
         }
 
         public async Task<GetBookResponse> GetBook(string id, string userId)
@@ -119,10 +119,10 @@ namespace MyBookListAPI.Repository
             }
         }
 
-        public async Task<ICollection<BookResponse>> GetBooks()
+        public async Task<ICollection<BookUserItem>> GetBooks()
         {
             var books = await _context.BookUsers
-                .Select(bu => new BookResponse
+                .Select(bu => new BookUserItem
                 {
                     Id = bu.BookId,
                     Authors = bu.Book.Authors.Select(a => a.Name).ToList(),
@@ -158,6 +158,42 @@ namespace MyBookListAPI.Repository
             {
                 return Array.Empty<Volume>();
             }
+        }
+
+        public async Task<BookUserResponse> UpdateBookStatus(string googleBooksId, string userId, UpdateStatusRequest request)
+        {
+            var response = new BookUserResponse();
+
+            var bookUser = await _context.BookUsers
+                .Include(bu => bu.User)
+                .Include(bu => bu.Book)
+                .ThenInclude(b => b.Authors)
+                .FirstOrDefaultAsync(bu => bu.UserId == userId && bu.Book.GoogleBooksId == googleBooksId);
+
+            if (bookUser == null)
+            {
+                response.Message = "Book has not been added to your list.";
+                return response;
+            }
+
+            bookUser.Status = request.Status;
+            await _context.SaveChangesAsync();
+
+            var authors = bookUser.Book.Authors.Select(a => a.Name).ToList();
+
+            response.Book = new BookUserItem
+            {
+                Id = bookUser.Book.Id,
+                Authors = authors,
+                GoogleBooksId = bookUser.Book.GoogleBooksId,
+                Cover = bookUser.Book.Cover,
+                Status = bookUser.Status,
+                Title = bookUser.Book.Title,
+                User = _mapper.Map<User>(bookUser.User)
+            };
+
+            response.Success = true;
+            return response;
         }
 
         private async Task AddAuthors(List<string> authors, Book book)
