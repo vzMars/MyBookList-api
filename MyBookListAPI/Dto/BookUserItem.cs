@@ -2,7 +2,7 @@
 
 namespace MyBookListAPI.Dto
 {
-    public class BookResponse
+    public class BookUserItem
     {
         public int Id { get; set; }
         public ICollection<string> Authors { get; set; } = new List<string>();

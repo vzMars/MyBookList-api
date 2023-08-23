@@ -1,8 +1,8 @@
 ﻿namespace MyBookListAPI.Dto
 {
-    public class AddBookResponse
+    public class BookUserResponse
     {
-        public BookResponse? Book { get; set; }
+        public BookUserItem? Book { get; set; }
         public bool Success { get; set; } = false;
         public string Message { get; set; } = string.Empty;
     }
