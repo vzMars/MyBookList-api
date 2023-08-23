@@ -87,6 +87,42 @@ namespace MyBookListAPI.Repository
             return response;
         }
 
+        public async Task<BookUserResponse> DeleteBook(string googleBooksId, string userId)
+        {
+            var response = new BookUserResponse();
+
+            var bookUser = await _context.BookUsers
+                .Include(bu => bu.User)
+                .Include(bu => bu.Book)
+                .ThenInclude(b => b.Authors)
+                .FirstOrDefaultAsync(bu => bu.UserId == userId && bu.Book.GoogleBooksId == googleBooksId);
+
+            if (bookUser == null)
+            {
+                response.Message = "Book has not been added to your list.";
+                return response;
+            }
+
+            _context.BookUsers.Remove(bookUser);
+            await _context.SaveChangesAsync();
+
+            var authors = bookUser.Book.Authors.Select(a => a.Name).ToList();
+
+            response.Book = new BookUserItem
+            {
+                Id = bookUser.Book.Id,
+                Authors = authors,
+                GoogleBooksId = bookUser.Book.GoogleBooksId,
+                Cover = bookUser.Book.Cover,
+                Status = bookUser.Status,
+                Title = bookUser.Book.Title,
+                User = _mapper.Map<User>(bookUser.User)
+            };
+
+            response.Success = true;
+            return response;
+        }
+
         public async Task<GetBookResponse> GetBook(string id, string userId)
         {
             var getBookResponse = new GetBookResponse();

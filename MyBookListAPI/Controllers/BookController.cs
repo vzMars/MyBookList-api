@@ -74,9 +74,16 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<string>> DeleteBook(int id)
+        public async Task<ActionResult<BookUserResponse>> DeleteBook(string id)
         {
-            return Ok("delete book route");
+            var response = await _bookRepository.DeleteBook(id, GetUserId());
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
     }
 }

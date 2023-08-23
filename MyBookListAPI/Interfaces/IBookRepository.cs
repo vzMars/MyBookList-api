@@ -9,5 +9,6 @@ namespace MyBookListAPI.Interfaces
         Task<ICollection<Volume>> SearchBooks(string query);
         Task<BookUserResponse> AddBook(AddBookRequest request, string userId);
         Task<BookUserResponse> UpdateBookStatus(string googleBooksId, string userId, UpdateStatusRequest request);
+        Task<BookUserResponse> DeleteBook(string googleBooksId, string userId);
     }
 }
