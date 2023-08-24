@@ -25,9 +25,16 @@ namespace MyBookListAPI.Controllers
         }
 
         [HttpGet("{username}")]
-        public async Task<ActionResult<string>> GetProfile(string username)
+        public async Task<ActionResult<string>> GetUserProfile(string username)
         {
-            return Ok("get profile route");
+            var response = await _userRepository.GetUserProfile(username);
+
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
     }
 }
