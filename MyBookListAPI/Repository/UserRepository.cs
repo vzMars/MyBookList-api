@@ -20,11 +20,11 @@ namespace MyBookListAPI.Repository
         public async Task<UserProfileResponse> GetUserProfile(string username)
         {
             var response = new UserProfileResponse();
-            var user = _context.Users
+            var user = await _context.Users
                 .Include(u => u.BookUsers)
                 .Include(u => u.Books)
                 .ThenInclude(b => b.Authors)
-                .FirstOrDefault(u => u.UserName == username);
+                .FirstOrDefaultAsync(u => u.UserName == username);
 
             if (user == null)
             {
