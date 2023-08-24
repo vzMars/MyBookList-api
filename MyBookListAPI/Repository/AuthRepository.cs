@@ -122,10 +122,14 @@ namespace MyBookListAPI.Repository
                     Email = user.Email,
                     Username = user.UserName
                 };
-                response.Message = "Account has been successfully created.";
-                response.Success = true;
 
-                return response;
+                var loginRequest = new LoginRequest
+                {
+                    Email = user.Email,
+                    Password = request.Password,
+                };
+
+                return await Login(loginRequest);
             }
 
             response.Message = "There was an error in creating the account. Please try again.";
