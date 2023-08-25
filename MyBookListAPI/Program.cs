@@ -32,6 +32,18 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowedOrigins",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000", "https://www.mybooklist.vzmars.com")
+            .AllowCredentials()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+        });
+});
+
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -45,6 +57,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.SameSite = SameSiteMode.None;
     options.Events.OnRedirectToAccessDenied = context =>
     {
         context.Response.StatusCode = 403;
@@ -68,6 +81,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowedOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
